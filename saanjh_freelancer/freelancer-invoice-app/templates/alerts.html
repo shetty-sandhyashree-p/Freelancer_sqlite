@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">⚙️ Admin Alerts & Activity Logs</h2>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button id="refreshBtn" class="btn btn-dark btn-sm">
+            🔄 Check Activities
+        </button>
+        <button id="legendToggle" class="btn btn-outline-secondary btn-sm">
+            Legend
+        </button>
+    </div>
+
+    <!-- Legend (hidden by default) -->
+    <div id="legend" class="p-3 mb-3 bg-light rounded shadow-sm" style="display:none;">
+        <div class="d-flex gap-3 flex-wrap">
+            <span class="badge bg-primary">CLIENT_*</span>
+            <small class="text-muted">Client add/update/delete</small>
+
+            <span class="badge bg-success">ITEM_*</span>
+            <small class="text-muted">Items / services</small>
+
+            <span class="badge bg-warning text-dark">INVOICE_*</span>
+            <small class="text-muted">Invoices</small>
+
+            <span class="badge bg-danger">*_DELETE / OVERDUE</span>
+            <small class="text-muted">Deletes & overdue</small>
+        </div>
+    </div>
+
+    {% if alerts %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped shadow-sm" id="alertsTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Alert Type</th>
+                        <th>Message</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody id="alertTableBody">
+                    {% for alert in alerts %}
+                    <tr>
+                        <td>{{ alert.id }}</td>
+                        <td>
+                            {% set t = alert.alert_type %}
+                            {% if t.endswith('_DELETE') or t == 'OVERDUE' %}
+                                <span class="badge bg-danger">{{ t }}</span>
+                            {% elif t.startswith('CLIENT_') %}
+                                <span class="badge bg-primary">{{ t }}</span>
+                            {% elif t.startswith('ITEM_') %}
+                                <span class="badge bg-success">{{ t }}</span>
+                            {% elif t.startswith('INVOICE_') %}
+                                <span class="badge bg-warning text-dark">{{ t }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ t }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ alert.message }}</td>
+                        <td>{{ alert.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            No admin alerts yet. Perform add/update/delete actions to generate logs.
+        </div>
+    {% endif %}
+
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="alertToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastMessage">New alerts loaded successfully ✅</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS for AJAX Refresh and Toast -->
+<script>
+(function() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    const legendToggle = document.getElementById('legendToggle');
+    const legend = document.getElementById('legend');
+    const alertTableBody = document.getElementById('alertTableBody');
+    const toastEl = document.getElementById('alertToast');
+    const toastMessage = document.getElementById('toastMessage');
+    let lastAlertCount = {{ alerts|length if alerts else 0 }};
+
+    // Bootstrap toast init
+    const toast = new bootstrap.Toast(toastEl, { delay: 2500 });
+
+    // Toggle legend visibility
+    legendToggle.addEventListener('click', () => {
+        legend.style.display = legend.style.display === 'none' ? 'block' : 'none';
+    });
+
+    function badgeClass(type) {
+        if (!type) return 'bg-secondary';
+        if (type.endsWith('_DELETE') || type === 'OVERDUE') return 'bg-danger';
+        if (type.startsWith('CLIENT_')) return 'bg-primary';
+        if (type.startsWith('ITEM_')) return 'bg-success';
+        if (type.startsWith('INVOICE_')) return 'bg-warning text-dark';
+        return 'bg-secondary';
+    }
+
+    async function fetchAlerts() {
+        try {
+            const res = await fetch('/api/alerts');
+            const data = await res.json();
+            if (!Array.isArray(data)) return;
+
+            // If new alerts exist, show toast
+            if (data.length > lastAlertCount) {
+                toastMessage.textContent = `✅ ${data.length - lastAlertCount} new alert(s) found!`;
+                toast.show();
+            } else if (data.length < lastAlertCount) {
+                toastMessage.textContent = "🔁 Alerts refreshed.";
+                toast.show();
+            }
+
+            lastAlertCount = data.length;
+            alertTableBody.innerHTML = '';
+
+            data.forEach(alert => {
+                const badge = badgeClass(alert.alert_type);
+                const row = `
+                    <tr>
+                        <td>${alert.id}</td>
+                        <td><span class="badge ${badge}">${alert.alert_type}</span></td>
+                        <td>${alert.message}</td>
+                        <td>${alert.created_at}</td>
+                    </tr>`;
+                alertTableBody.insertAdjacentHTML('beforeend', row);
+            });
+        } catch (err) {
+            console.error("Error loading alerts:", err);
+        }
+    }
+
+    refreshBtn.addEventListener('click', fetchAlerts);
+
+    // Auto-refresh every 30s
+    setInterval(fetchAlerts, 30000);
+})();
+</script>
+{% endblock %}

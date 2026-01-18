@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow-sm p-4 mx-auto" style="max-width:650px;">
+  <h3 class="fw-bold text-primary mb-3">
+    <i class="fa-solid fa-pen-to-square me-2"></i>{{ title }}
+  </h3>
+
+  <form method="post">
+    {% for f in fields %}
+      <div class="mb-3">
+        <label class="form-label text-capitalize">{{ f }}</label>
+        <input type="text" name="{{ f }}" class="form-control"
+               value="{{ client[f] if client else item[f] if item else '' }}"
+               required>
+      </div>
+    {% endfor %}
+
+    <div class="text-end">
+      <button type="submit" class="btn btn-success">
+        <i class="fa-solid fa-save me-1"></i>Save
+      </button>
+      <a href="javascript:history.back()" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: DejaVu Sans, sans-serif; margin:40px; }
+    h1 { color:#7c3aed; }
+    table { border-collapse: collapse; width:100%; margin-top:20px; }
+    th, td { border:1px solid #ccc; padding:8px; }
+    th { background:#7c3aed; color:#fff; }
+    tfoot td { font-weight:bold; }
+  </style>
+</head>
+<body>
+  <img src="{{ url_for('static', filename='logo.png') }}" height="60"><br>
+  <h1>Invoice #{{ inv.id }}</h1>
+  <p><strong>Client:</strong> {{ inv.name }} — {{ inv.company }}</p>
+  <p><strong>Date:</strong> {{ inv.date }} | <strong>Due:</strong> {{ inv.due_date }}</p>
+  <table>
+    <thead><tr><th>Item</th><th>Qty</th><th>Rate (RS)</th><th>Subtotal (Rs)</th></tr></thead>
+    <tbody>
+    {% for i in items %}
+      <tr><td>{{ i.description }}</td><td>{{ i.quantity }}</td><td>{{ i.rate }}</td><td>{{ i.subtotal }}</td></tr>
+    {% endfor %}
+    </tbody>
+    <tfoot><tr><td colspan="3" align="right">Total</td><td>Rs{{ total }}</td></tr></tfoot>
+  </table>
+</body>
+</html>

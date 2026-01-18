@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-center mb-4 text-primary">
+    ✏️ Edit Invoice #{{ invoice['id'] }}
+  </h2>
+
+  <form method="POST" class="card shadow p-4">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="client_id" class="form-label fw-semibold">Client</label>
+        <select id="client_id" name="client_id" class="form-select" required>
+          {% for c in clients %}
+            <option value="{{ c['id'] }}" {% if c['id'] == invoice['client_id'] %}selected{% endif %}>
+              {{ c['name'] }} ({{ c['company'] }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="due_date" class="form-label fw-semibold">Due Date</label>
+        <input type="date" id="due_date" name="due_date" value="{{ invoice['due_date'] }}" class="form-control" required>
+      </div>
+    </div>
+
+    <h5 class="mt-4 mb-3 text-dark">Invoice Items</h5>
+
+    {% if items %}
+    <table class="table table-bordered table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Description</th>
+          <th>Rate (Rs)</th>
+          <th>Quantity</th>
+          <th>Subtotal (Rs)</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>{{ item['description'] }}</td>
+          <td>{{ item['rate'] }}</td>
+          <td style="width: 120px;">
+            <input type="number" name="quantity" value="{{ item['quantity'] }}" min="1"
+                   class="form-control form-control-sm text-center" required>
+            <input type="hidden" name="item_id" value="{{ item['ii_id'] }}">
+          </td>
+          <td>{{ "%.2f"|format(item['subtotal']) }}</td>
+          <td class="text-center">
+            <a href="{{ url_for('delete_invoice_item', id=item['ii_id'], invoice_id=invoice['id']) }}"
+               class="btn btn-sm btn-danger"
+               onclick="return confirm('Delete this item?');">
+              <i class="fa-solid fa-trash"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="alert alert-info text-center">No items yet for this invoice.</div>
+    {% endif %}
+
+    <div class="mt-4 mb-3 border-top pt-3">
+      <h6 class="fw-semibold">Add New Item</h6>
+      <form method="POST" action="{{ url_for('add_invoice_item', invoice_id=invoice['id']) }}" class="row g-2">
+        <div class="col-md-6">
+          <select name="item_id" class="form-select">
+            {% for i in all_items %}
+              <option value="{{ i['id'] }}">{{ i['description'] }} (Rs{{ i['rate'] }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <input type="number" name="quantity" value="1" class="form-control" min="1" required>
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fa-solid fa-plus"></i> Add Item
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="mt-4 text-center">
+      <button type="submit" class="btn btn-success px-4">
+        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+      </button>
+      <a href="{{ url_for('invoices') }}" class="btn btn-secondary px-4">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

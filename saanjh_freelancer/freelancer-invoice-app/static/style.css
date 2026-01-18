@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+  --saanjh-purple: #7c3aed;
+  --saanjh-teal: #14b8a6;
+  --saanjh-bg: #f8fafc;
+  --saanjh-text: #1f2937;
+}
+
+/* Global */
+body {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.05rem;
+  background-color: var(--saanjh-bg);
+  color: var(--saanjh-text);
+  scroll-behavior: smooth;
+}
+
+/* Navbar */
+.navbar {
+  background: linear-gradient(90deg, var(--saanjh-purple), var(--saanjh-teal));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.navbar .navbar-brand {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.navbar .nav-link {
+  color: #fff !important;
+  font-weight: 500;
+  margin: 0 6px;
+  transition: color 0.2s, transform 0.2s;
+}
+.navbar .nav-link:hover {
+  color: #e0e7ff !important;
+  transform: translateY(-1px);
+}
+.navbar .nav-link.active {
+  border-bottom: 2px solid #fff;
+}
+
+/* Hero Header (Dashboard top banner) */
+.dashboard-hero {
+  background:
+    linear-gradient(rgba(124, 58, 237, 0.85), rgba(20, 184, 166, 0.85)),
+    url('https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1600&q=80')
+    center/cover no-repeat;
+  color: white;
+  border-radius: 10px;
+}
+
+/* Cards */
+.card {
+  border-radius: 10px;
+  transition: all 0.25s ease-in-out;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* Buttons */
+.btn {
+  transition: all 0.25s ease;
+  font-weight: 500;
+}
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  background-color: var(--saanjh-teal);
+  border: none;
+}
+.btn-success:hover {
+  background-color: #0d9488;
+}
+.btn-warning {
+  background-color: #f59e0b;
+  border: none;
+  color: white;
+}
+.btn-warning:hover {
+  background-color: #d97706;
+}
+.btn-danger {
+  background-color: #ef4444;
+  border: none;
+}
+.btn-danger:hover {
+  background-color: #b91c1c;
+}
+.btn-secondary {
+  background-color: #6b7280;
+  border: none;
+}
+.btn-secondary:hover {
+  background-color: #4b5563;
+}
+
+/* Tables */
+.table-hover tbody tr:hover {
+  background-color: #f3e8ff;
+  transition: background-color 0.25s;
+}
+.table thead th {
+  font-weight: 600;
+}
+
+/* Forms */
+.form-control,
+.form-select {
+  font-size: 1.05rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+}
+.form-label {
+  font-weight: 600;
+}
+
+/* Badges */
+.badge {
+  font-size: 0.9rem;
+  padding: 0.5em 0.75em;
+  border-radius: 6px;
+}
+
+/* Footer */
+footer {
+  background-color: #fff;
+  font-size: 0.95rem;
+  border-top: 1px solid #e5e7eb;
+  padding: 1rem 0;
+}
+
+/* Utility animations */
+.hover-scale {
+  transition: transform 0.3s;
+}
+.hover-scale:hover {
+  transform: scale(1.03);
+}

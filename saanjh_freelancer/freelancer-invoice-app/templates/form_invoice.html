@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow-sm p-4 mx-auto" style="max-width:800px;">
+  <h3 class="fw-bold text-primary mb-3">
+    <i class="fa-solid fa-file-invoice me-2"></i>Invoice Details
+  </h3>
+
+  <form method="post" id="invoiceForm">
+    <!-- Client Selection -->
+    <div class="mb-3">
+      <label class="form-label">Select Client</label>
+      <select name="client_id" class="form-select" required>
+        {% for c in clients %}
+          <option value="{{ c.id }}">{{ c.name }} — {{ c.company }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Item Rows -->
+    <h6 class="fw-semibold text-secondary mt-4 mb-2">Items</h6>
+    <div id="itemsContainer">
+      <div class="row g-2 mb-2 item-row">
+        <div class="col-md-7">
+          <select name="item_id" class="form-select" required>
+            <option value="">Select Service</option>
+            {% for i in items %}
+              <option value="{{ i.id }}">{{ i.description }} (Rs. {{ i.rate }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <input type="number" name="quantity" min="1" class="form-control" placeholder="Qty" required>
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="button" class="btn btn-danger remove-item">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add More Button -->
+    <button type="button" id="addItem" class="btn btn-outline-primary btn-sm mb-3">
+      <i class="fa-solid fa-plus me-1"></i>Add Item
+    </button>
+
+    <!-- Submit Buttons -->
+    <div class="text-end">
+      <button type="submit" class="btn btn-success">
+        <i class="fa-solid fa-save me-1"></i>Save Invoice
+      </button>
+      <a href="{{ url_for('invoices') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<!-- JavaScript for dynamic items -->
+<script>
+document.getElementById('addItem').onclick = () => {
+  const container = document.getElementById('itemsContainer');
+  const row = container.firstElementChild.cloneNode(true);
+  row.querySelectorAll('input,select').forEach(el => el.value = '');
+  container.appendChild(row);
+  row.querySelector('.remove-item').onclick = () => row.remove();
+};
+document.querySelectorAll('.remove-item').forEach(btn =>
+  btn.onclick = e => e.target.closest('.item-row').remove()
+);
+</script>
+
+{% endblock %}

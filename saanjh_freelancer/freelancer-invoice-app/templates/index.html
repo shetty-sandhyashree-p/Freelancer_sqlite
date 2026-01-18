@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Hero Header -->
+<div class="p-5 text-center text-white rounded shadow-sm mb-4"
+     style="background:
+       linear-gradient(rgba(124,58,237,.85),rgba(20,184,166,.85)),
+       url('https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1600&q=80')
+       center/cover no-repeat;">
+  <img src="{{ url_for('static', filename='logo.png') }}" height="80" class="mb-3">
+  <h1 class="fw-bold mb-1">Welcome to {{ config['BUSINESS_NAME'] }} Dashboard</h1>
+  <p class="lead mb-0">Manage clients, invoices & payments seamlessly</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="row text-center g-4 mb-4">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm hover-scale">
+      <div class="card-body">
+        <i class="fa-solid fa-users fa-2x text-primary mb-2"></i>
+        <h6 class="text-muted">Total Clients</h6>
+        <h2 class="fw-bold">{{ total_clients }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm hover-scale">
+      <div class="card-body">
+        <i class="fa-solid fa-file-invoice fa-2x text-success mb-2"></i>
+        <h6 class="text-muted">Total Invoices</h6>
+        <h2 class="fw-bold">{{ total_invoices }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm hover-scale">
+      <div class="card-body">
+        <i class="fa-solid fa-coins fa-2x text-danger mb-2"></i>
+        <h6 class="text-muted">Unpaid Balance</h6>
+        <h2 class="fw-bold text-danger">Rs. {{ unpaid }}</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart -->
+<div class="card border-0 shadow-sm p-4">
+  <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>Invoice Summary</h5>
+  <canvas id="chart" style="max-height:300px;"></canvas>
+</div>
+
+<!-- ChartJS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const ctx = document.getElementById('chart').getContext('2d');
+  const chartLabels = {{ labels|tojson|safe }};
+  const chartValues = {{ values|tojson|safe }};
+
+  new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: chartLabels,
+      datasets: [{
+        data: chartValues,
+        backgroundColor: ['#ef4444','#22c55e'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      plugins: { legend: { position: 'bottom' } },
+      responsive: true
+    }
+  });
+});
+</script>
+
+<!-- Hover animation -->
+<style>
+.hover-scale:hover {transform:scale(1.03);transition:0.3s;}
+</style>
+
+{% endblock %}
